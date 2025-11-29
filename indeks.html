@@ -1,0 +1,1285 @@
+<!doctype html>
+<html lang="id">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ANGKRINGAN BOSSKU - Order Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    
+    * {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .menu-item-card {
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .menu-item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    
+    .cart-badge {
+      animation: pulse 0.3s ease-in-out;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+    
+    .toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #10b981;
+      color: white;
+      padding: 16px 24px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+    
+    .stock-badge {
+      animation: blink 1.5s infinite;
+    }
+    
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    
+    /* Splash Screen Styles */
+    #splashScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #9B4444;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      animation: fadeOut 0.5s ease-out 2.5s forwards;
+    }
+    
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+        visibility: hidden;
+      }
+    }
+    
+    .splash-logo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      margin-bottom: 24px;
+      animation: zoomIn 0.6s ease-out;
+      overflow: hidden;
+    }
+    
+    .splash-logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    @keyframes zoomIn {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    .splash-title {
+      color: white;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      animation: slideUp 0.6s ease-out 0.3s backwards;
+    }
+    
+    .splash-tagline {
+      color: white;
+      font-size: 16px;
+      opacity: 0.9;
+      animation: slideUp 0.6s ease-out 0.5s backwards;
+    }
+    
+    @keyframes slideUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+    
+    #mainContent {
+      opacity: 0;
+      animation: fadeIn 0.5s ease-in 2.5s forwards;
+    }
+    
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="w-full min-h-full"><!-- Splash Screen -->
+  <div id="splashScreen">
+   <div class="splash-logo"><img id="splashLogoImg" src="angkringan.png" alt="Logo Angkringan" onerror="this.style.display='none'; this.parentElement.innerHTML='<p class=\'text-sm font-semibold\' style=\'color: #9B4444;\'>Logo</p>';">
+   </div>
+   <h1 id="splashRestaurantName" class="splash-title">ANGKRINGAN BOSSKU</h1>
+   <p id="splashTagline" class="splash-tagline">Mangan Sak Puase, Harga Sak Cendeke.</p>
+  </div><!-- Main Content -->
+  <div id="mainContent"><!-- Toast Container -->
+   <div id="toastContainer"></div><!-- Floating Cart Button --> <button id="cartButton" class="fixed top-6 right-6 z-50 p-4 rounded-full shadow-lg transition-colors">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg><span id="cartBadge" class="absolute -top-1 -right-1 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center cart-badge hidden">0</span> </button> <!-- Hero Section -->
+   <section id="hero" class="w-full py-12 px-4">
+    <div class="max-w-7xl mx-auto text-center"><!-- Logo Container -->
+     <div id="logoContainer" class="mb-8 flex justify-center items-center min-h-32">
+      <div class="w-32 h-32 rounded-full border-4 flex items-center justify-center overflow-hidden bg-white"><img id="heroLogoImg" src="angkringan.png" alt="Logo Angkringan Bossku" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<p class=\'text-sm font-semibold opacity-60\'>Tempat Logo</p>';">
+      </div>
+     </div>
+     <h2 id="restaurantName" class="text-4xl font-bold mb-4">Selamat Datang di ANGKRINGAN BOSSKU</h2>
+     <p id="tagline" class="text-lg mb-6">Nikmati kuliner khas angkringan dengan harga terjangkau</p><button id="orderNowBtn" class="px-8 py-3 rounded-full font-semibold transition-colors"> Pesan Sekarang </button>
+    </div>
+   </section><!-- Filter Tabs -->
+   <section class="w-full px-4 mb-6">
+    <div class="max-w-7xl mx-auto">
+     <div class="flex gap-2 overflow-x-auto pb-2"><button class="filter-btn px-6 py-2 rounded-full font-semibold whitespace-nowrap transition-colors" data-filter="all"> Semua Menu </button> <button class="filter-btn px-6 py-2 rounded-full font-semibold whitespace-nowrap transition-colors" data-filter="makanan"> Makanan </button> <button class="filter-btn px-6 py-2 rounded-full font-semibold transition-colors whitespace-nowrap" data-filter="minuman"> Minuman </button> <button class="filter-btn px-6 py-2 rounded-full font-semibold whitespace-nowrap transition-colors" data-filter="paket"> Paket Hemat </button>
+     </div>
+    </div>
+   </section><!-- Menu Grid -->
+   <section class="w-full px-4 mb-12">
+    <div class="max-w-7xl mx-auto">
+     <h3 class="text-2xl font-bold mb-6">Menu Kami</h3>
+     <div id="menuGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><!-- Menu items will be inserted here -->
+     </div>
+    </div>
+   </section><!-- Location & Contact -->
+   <section id="contact" class="w-full px-4 py-12">
+    <div class="max-w-7xl mx-auto">
+     <h3 class="text-2xl font-bold mb-6 text-center">Lokasi &amp; Kontak</h3>
+     <div class="grid md:grid-cols-2 gap-8">
+      <div class="rounded-lg p-6">
+       <h4 class="font-semibold text-lg mb-4">Informasi</h4>
+       <div class="space-y-3">
+        <div class="flex items-start gap-3">
+         <svg class="w-6 h-6 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+         </svg>
+         <p id="address">Jl. Contoh No. 123, Yogyakarta</p>
+        </div>
+        <div class="flex items-start gap-3">
+         <svg class="w-6 h-6 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+         </svg>
+         <p id="openingHours">Buka Setiap Hari: 17.00 - 02.00 WIB</p>
+        </div>
+        <div class="flex items-start gap-3">
+         <svg class="w-6 h-6 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+         </svg><a id="whatsappLink" href="#" class="hover:underline">WhatsApp: 0812-3456-7890</a>
+        </div>
+       </div>
+      </div>
+      <div class="rounded-lg p-6">
+       <h4 class="font-semibold text-lg mb-4">Testimoni</h4>
+       <div class="space-y-4">
+        <div class="border-l-4 pl-4 py-2">
+         <p class="text-sm mb-2">"Enak banget! Harga terjangkau untuk kantong mahasiswa"</p>
+         <p class="text-xs font-semibold">⭐⭐⭐⭐⭐ - Widodo</p>
+        </div>
+        <div class="border-l-4 pl-4 py-2">
+         <p class="text-sm mb-2">"Sate usus favoritku! Bumbunya pas poll"</p>
+         <p class="text-xs font-semibold">⭐⭐⭐⭐⭐ - Sriyanti</p>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Variant Selection Modal -->
+   <div id="variantModal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0" id="variantOverlay"></div>
+    <div class="absolute inset-0 flex items-end md:items-center justify-center p-4">
+     <div class="relative w-full max-w-lg max-h-full md:max-h-[90%] rounded-t-3xl md:rounded-3xl overflow-hidden">
+      <div class="p-6">
+       <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold" id="variantModalTitle">Pilih Kopi</h3><button id="closeVariantBtn" class="p-2 rounded-full transition-colors">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+         </svg></button>
+       </div>
+       <div class="space-y-4 mb-6">
+        <div><label class="block font-semibold mb-2">Pilih Jenis Kopi:</label> <select id="variantSelect" class="w-full p-3 rounded-lg border-2 font-medium"> <!-- Variants will be inserted here --> </select>
+        </div>
+        <div><label class="block font-semibold mb-2">Pilih Suhu:</label>
+         <div id="temperatureOptions" class="grid grid-cols-2 gap-3"><!-- Temperature options will be inserted here -->
+         </div>
+        </div>
+       </div><button id="confirmVariantBtn" class="w-full py-4 rounded-full font-semibold text-lg transition-colors"> Tambah ke Keranjang </button>
+      </div>
+     </div>
+    </div>
+   </div><!-- QRIS Modal -->
+   <div id="qrisModal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0" id="qrisOverlay"></div>
+    <div class="absolute inset-0 flex items-center justify-center p-4">
+     <div class="relative w-full max-w-md rounded-3xl overflow-hidden">
+      <div class="p-6 text-center">
+       <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Pembayaran QRIS</h3><button id="closeQRISBtn" class="p-2 rounded-full transition-colors">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+         </svg></button>
+       </div>
+       <div class="mb-6">
+        <div class="rounded-2xl p-6 mb-4 inline-block">
+         <div class="w-64 h-64 rounded-xl flex items-center justify-center mb-4"><img id="qrisImage" src="qris.jpg" alt="QRIS Code" class="w-full h-full object-contain rounded-xl" onerror="this.style.display='none'; this.parentElement.innerHTML='<div class=\\'w-full h-full border-4 border-dashed rounded-xl flex flex-col items-center justify-center gap-3\\'><svg class=\\'w-16 h-16\\'  fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z\\'></path></svg><p class=\\'font-semibold\\'>Kode QRIS</p></div>';">
+         </div>
+         <p class="text-sm font-semibold mb-2">Scan QRIS dengan aplikasi e-wallet</p>
+         <p class="text-xs opacity-70">GoPay, OVO, Dana, ShopeePay, LinkAja, dll</p>
+        </div>
+        <div class="rounded-lg p-4 mb-4">
+         <div class="flex justify-between items-center mb-2"><span class="font-semibold">Total Pembayaran:</span> <span id="qrisTotal" class="text-2xl font-bold">Rp 0</span>
+         </div>
+        </div>
+       </div>
+       <div class="space-y-3"><button id="confirmPaymentBtn" class="w-full py-4 rounded-full font-semibold text-lg transition-colors"> Saya Sudah Bayar </button> <button id="backToCartBtn" class="w-full py-3 rounded-full font-semibold transition-colors border-2"> Kembali ke Keranjang </button>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div><!-- Cart Modal -->
+   <div id="cartModal" class="fixed inset-0 z-50 hidden">
+    <div class="modal-overlay absolute inset-0" id="cartOverlay"></div>
+    <div class="absolute inset-0 flex items-end md:items-center justify-center p-4">
+     <div class="relative w-full max-w-2xl max-h-full md:max-h-[90%] rounded-t-3xl md:rounded-3xl overflow-hidden">
+      <div class="p-6">
+       <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold">Keranjang Belanja</h3><button id="closeCartBtn" class="p-2 rounded-full transition-colors">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+         </svg></button>
+       </div>
+       <div id="cartItems" class="space-y-4 mb-6 max-h-96 overflow-y-auto"><!-- Cart items will be inserted here -->
+       </div>
+       <div class="border-t pt-4 mb-6">
+        <div class="flex justify-between items-center text-xl font-bold mb-4"><span>Total:</span> <span id="totalPrice">Rp 0</span>
+        </div>
+        <div class="mb-4"><label class="block font-semibold mb-2 text-sm">Metode Pembayaran:</label>
+         <div class="grid grid-cols-2 gap-3"><button id="paymentWhatsApp" class="payment-method-btn py-3 px-4 rounded-lg font-semibold transition-colors border-2 flex items-center justify-center gap-2">
+           <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+           </svg> WhatsApp </button> <button id="paymentQRIS" class="payment-method-btn py-3 px-4 rounded-lg font-semibold transition-colors border-2 flex items-center justify-center gap-2">
+           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+           </svg> QRIS </button>
+         </div>
+        </div>
+       </div><button id="checkoutBtn" class="w-full py-4 rounded-full font-semibold text-lg transition-colors"> Lanjut Bayar </button>
+      </div>
+     </div>
+    </div>
+   </div>
+   <script>
+    // Menu data with reference content
+    const menuData = [
+      {
+        id: 'nasi-kucing',
+        name: 'Nasi Kucing',
+        price: 3000,
+        category: 'makanan',
+        description: 'Nasi bungkus dengan isian teri & sambal',
+        spicy: false,
+        stock: 30,
+        image: 'nasku.jpg'
+      },
+      {
+        id: 'nasi-bakar',
+        name: 'Nasi Bakar',
+        price: 5000,
+        category: 'makanan',
+        description: 'Nasi bakar dengan isian ayam suwir',
+        spicy: false,
+        stock: 25,
+        image: 'nasbak.jpg'
+      },
+      {
+        id: 'nasi-soto',
+        name: 'Nasi Soto',
+        price: 6000,
+        category: 'makanan',
+        description: 'Nasi dengan kuah soto ayam hangat',
+        spicy: false,
+        stock: 20,
+        image: 'soto.jpg'
+      },
+      {
+        id: 'sate-usus',
+        name: 'Sate Usus',
+        price: 2000,
+        category: 'makanan',
+        description: 'Sate usus ayam bakar dengan bumbu kacang',
+        spicy: false,
+        stock: 50,
+        image: 'satean.jpg'
+      },
+      {
+        id: 'sate-puyuh',
+        name: 'Sate Puyuh',
+        price: 3000,
+        category: 'makanan',
+        description: 'Sate telur puyuh dengan bumbu kecap',
+        spicy: false,
+        stock: 45,
+        image: 'satean.jpg'
+      },
+      {
+        id: 'bakso-bakar',
+        name: 'Bakso Bakar',
+        price: 3000,
+        category: 'makanan',
+        description: 'Bakso bakar dengan saus sambal',
+        spicy: false,
+        stock: 40,
+        image: 'bakso.jpg'
+      },
+      {
+        id: 'tempe-goreng',
+        name: 'Tempe Goreng',
+        price: 1500,
+        category: 'makanan',
+        description: 'Tempe goreng tepung renyah',
+        spicy: false,
+        stock: 60,
+        image: 'goreng.jpg'
+      },
+      {
+        id: 'tahu-krispy',
+        name: 'Tahu Krispy',
+        price: 1500,
+        category: 'makanan',
+        description: 'Tahu goreng crispy dengan cabai rawit',
+        spicy: false,
+        stock: 55,
+        image: 'tahu.jpg'
+      },
+      {
+        id: 'pisang-goreng',
+        name: 'Pisang Goreng',
+        price: 1500,
+        category: 'makanan',
+        description: 'Pisang goreng crispy manis',
+        spicy: false,
+        stock: 50,
+        image: 'pisang.jpg'
+      },
+      {
+        id: 'teh',
+        name: 'Teh (Es/Hangat)',
+        price: 3000,
+        category: 'minuman',
+        description: 'Teh manis pilihan es atau hangat',
+        spicy: false,
+        stock: 100,
+        image: 'esteh.jpg',
+        hasTemperature: true,
+        temperatures: ['Es', 'Hangat']
+      },
+      {
+        id: 'jeruk',
+        name: 'Jeruk (Es/Hangat)',
+        price: 5000,
+        category: 'minuman',
+        description: 'Jeruk peras segar pilihan es atau hangat',
+        spicy: false,
+        stock: 40,
+        image: 'esjeruk.jpg',
+        hasTemperature: true,
+        temperatures: ['Es', 'Hangat']
+      },
+      {
+        id: 'kopi',
+        name: 'Kopi (Es/Hangat)',
+        price: 5000,
+        category: 'minuman',
+        description: 'Pilihan kopi: Good Day, Indocafe, ABC Susu, ABC Mocca, Torabika, Kapal Api, Nescafe',
+        spicy: false,
+        stock: 30,
+        image: 'ngopi.jpg',
+        hasVariants: true,
+        variants: [
+          { id: 'good-day', name: 'Good Day Cappuccino' },
+          { id: 'indocafe', name: 'Indocafe' },
+          { id: 'abc-susu', name: 'ABC Susu' },
+          { id: 'abc-mocca', name: 'ABC Mocca' },
+          { id: 'torabika', name: 'Torabika Cappuccino' },
+          { id: 'kapal-api', name: 'Kapal Api' },
+          { id: 'nescafe', name: 'Nescafe' }
+        ],
+        temperatures: ['Es', 'Hangat']
+      },
+      {
+        id: 'wedang-jahe',
+        name: 'Wedang Jahe',
+        price: 7000,
+        category: 'minuman',
+        description: 'Wedang jahe hangat khas Jawa',
+        spicy: false,
+        stock: 25,
+        image: 'wedang.jpg'
+      },
+      {
+        id: 'susu',
+        name: 'Susu (Es/Hangat)',
+        price: 5000,
+        category: 'minuman',
+        description: 'Susu segar pilihan es atau hangat',
+        spicy: false,
+        stock: 40,
+        image: 'nyusu.jpg',
+        hasTemperature: true,
+        temperatures: ['Es', 'Hangat']
+      },
+      {
+        id: 'paket-single',
+        name: 'Paket Single',
+        price: 10000,
+        category: 'paket',
+        description: '1 nasi kucing + 1 sate puyuh + 1 tempe goreng + 1 es teh (free refill)',
+        spicy: true,
+        stock: 30,
+        image: 'paket-single.jpg'
+      },
+      {
+        id: 'paket-berdua',
+        name: 'Paket Berdua',
+        price: 15000,
+        category: 'paket',
+        description: '2 nasi kucing + 2 sate usus + 2 es teh (free refill)',
+        spicy: true,
+        stock: 25,
+        image: 'paket-berdua.jpg'
+      },
+      {
+        id: 'paket-jumbo',
+        name: 'Paket Jumbo',
+        price: 25000,
+        category: 'paket',
+        description: '3 nasi kucing + 2 sate usus + 2 gorengan + 2 es teh (free refill)',
+        spicy: true,
+        stock: 20,
+        image: 'paket-jumbo.jpg'
+      }
+    ];
+
+    // Config and state
+    const defaultConfig = {
+      restaurant_name: 'ANGKRINGAN BOSSKU',
+      tagline: 'Mangan Sak Puase, Harga Sak Cendeke.',
+      whatsapp_number: '628123456789',
+      address: 'Jl. Contoh No. 123, Yogyakarta',
+      opening_hours: 'Buka Setiap Hari: 17.00 - 02.00 WIB',
+      background_color: '#F4E4E4',
+      surface_color: '#FFFFFF',
+      text_color: '#5C1F1F',
+      primary_action_color: '#9B4444',
+      secondary_action_color: '#7A3535',
+      font_family: 'Poppins',
+      font_size: 16
+    };
+
+    let currentFilter = 'all';
+    let cartData = [];
+    let selectedVariantItem = null;
+    let selectedVariant = null;
+    let selectedTemperature = null;
+    let selectedPaymentMethod = 'whatsapp'; // default payment method
+
+    // LocalStorage functions
+    function loadCartFromStorage() {
+      try {
+        const stored = localStorage.getItem('angkringan_cart');
+        if (stored) {
+          cartData = JSON.parse(stored);
+          updateCartUI();
+        }
+      } catch (e) {
+        console.error('Error loading cart:', e);
+        cartData = [];
+      }
+    }
+
+    function saveCartToStorage() {
+      try {
+        localStorage.setItem('angkringan_cart', JSON.stringify(cartData));
+        updateCartUI();
+      } catch (e) {
+        console.error('Error saving cart:', e);
+      }
+    }
+
+    async function initApp() {
+      // Apply default config immediately for local testing
+      await onConfigChange(defaultConfig);
+      
+      // Load cart from localStorage
+      loadCartFromStorage();
+
+      // Initialize Element SDK
+      if (window.elementSdk) {
+        await window.elementSdk.init({
+          defaultConfig,
+          onConfigChange,
+          mapToCapabilities,
+          mapToEditPanelValues
+        });
+      }
+
+      renderMenu();
+      setupEventListeners();
+    }
+
+    async function onConfigChange(config) {
+      const customFont = config.font_family || defaultConfig.font_family;
+      const baseSize = config.font_size || defaultConfig.font_size;
+      const baseFontStack = 'Arial, sans-serif';
+
+      // Update splash screen
+      const splashScreen = document.getElementById('splashScreen');
+      if (splashScreen) {
+        splashScreen.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+        document.getElementById('splashRestaurantName').textContent = config.restaurant_name || defaultConfig.restaurant_name;
+        document.getElementById('splashTagline').textContent = config.tagline || defaultConfig.tagline;
+      }
+
+      // Apply colors
+      document.body.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      document.getElementById('hero').style.backgroundColor = config.background_color || defaultConfig.background_color;
+      document.getElementById('hero').style.color = config.text_color || defaultConfig.text_color;
+      document.getElementById('contact').style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+      document.getElementById('contact').style.color = config.text_color || defaultConfig.text_color;
+      
+      const logoContainer = document.getElementById('logoContainer');
+      const logoPlaceholder = logoContainer.querySelector('div');
+      logoPlaceholder.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+      logoPlaceholder.style.color = config.text_color || defaultConfig.text_color;
+      
+      const cartButton = document.getElementById('cartButton');
+      cartButton.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+      cartButton.style.color = config.surface_color || defaultConfig.surface_color;
+      
+      const cartBadge = document.getElementById('cartBadge');
+      cartBadge.style.backgroundColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+      cartBadge.style.color = config.surface_color || defaultConfig.surface_color;
+      
+      const orderNowBtn = document.getElementById('orderNowBtn');
+      orderNowBtn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+      orderNowBtn.style.color = config.surface_color || defaultConfig.surface_color;
+      
+      const checkoutBtn = document.getElementById('checkoutBtn');
+      checkoutBtn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+      checkoutBtn.style.color = config.surface_color || defaultConfig.surface_color;
+      
+      const confirmVariantBtn = document.getElementById('confirmVariantBtn');
+      confirmVariantBtn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+      confirmVariantBtn.style.color = config.surface_color || defaultConfig.surface_color;
+      
+      const variantModalContent = document.querySelector('#variantModal .rounded-t-3xl');
+      if (variantModalContent) {
+        variantModalContent.style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+        variantModalContent.style.color = config.text_color || defaultConfig.text_color;
+      }
+      
+      const cartModalContent = document.querySelector('#cartModal .rounded-t-3xl');
+      if (cartModalContent) {
+        cartModalContent.style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+        cartModalContent.style.color = config.text_color || defaultConfig.text_color;
+      }
+      
+      const qrisModalContent = document.querySelector('#qrisModal .rounded-3xl > div');
+      if (qrisModalContent) {
+        qrisModalContent.style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+        qrisModalContent.style.color = config.text_color || defaultConfig.text_color;
+      }
+      
+      const qrisTotalBg = document.querySelector('#qrisModal .rounded-lg');
+      if (qrisTotalBg) {
+        qrisTotalBg.style.backgroundColor = config.background_color || defaultConfig.background_color;
+      }
+      
+      const confirmPaymentBtn = document.getElementById('confirmPaymentBtn');
+      if (confirmPaymentBtn) {
+        confirmPaymentBtn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+        confirmPaymentBtn.style.color = config.surface_color || defaultConfig.surface_color;
+      }
+      
+      const backToCartBtn = document.getElementById('backToCartBtn');
+      if (backToCartBtn) {
+        backToCartBtn.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+        backToCartBtn.style.color = config.primary_action_color || defaultConfig.primary_action_color;
+        backToCartBtn.style.backgroundColor = 'transparent';
+      }
+      
+      updatePaymentMethodButtons();
+      
+      const variantSelect = document.getElementById('variantSelect');
+      variantSelect.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+      variantSelect.style.color = config.text_color || defaultConfig.text_color;
+
+      const filterBtns = document.querySelectorAll('.filter-btn');
+      filterBtns.forEach(btn => {
+        if (btn.dataset.filter === currentFilter) {
+          btn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+          btn.style.color = config.surface_color || defaultConfig.surface_color;
+        } else {
+          btn.style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+          btn.style.color = config.text_color || defaultConfig.text_color;
+        }
+      });
+
+      const menuCards = document.querySelectorAll('.menu-item-card');
+      menuCards.forEach(card => {
+        card.style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+        card.style.color = config.text_color || defaultConfig.text_color;
+      });
+
+      const addToCartBtns = document.querySelectorAll('.add-to-cart-btn');
+      addToCartBtns.forEach(btn => {
+        btn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+        btn.style.color = config.surface_color || defaultConfig.surface_color;
+      });
+
+      // Apply fonts
+      document.getElementById('restaurantName').style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.getElementById('restaurantName').style.fontSize = `${baseSize * 1.5}px`;
+      
+      document.getElementById('tagline').style.fontFamily = `${customFont}, ${baseFontStack}`;
+      document.getElementById('tagline').style.fontSize = `${baseSize * 0.875}px`;
+
+      document.querySelectorAll('h2, h3, h4').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+        el.style.fontSize = `${baseSize * 1.5}px`;
+      });
+
+      document.querySelectorAll('p, button, a').forEach(el => {
+        el.style.fontFamily = `${customFont}, ${baseFontStack}`;
+        el.style.fontSize = `${baseSize}px`;
+      });
+
+      // Update text content
+      document.getElementById('address').textContent = config.address || defaultConfig.address;
+      document.getElementById('openingHours').textContent = config.opening_hours || defaultConfig.opening_hours;
+      
+      const waNumber = config.whatsapp_number || defaultConfig.whatsapp_number;
+      const formattedNumber = waNumber.startsWith('62') ? '0' + waNumber.substring(2) : waNumber;
+      document.getElementById('whatsappLink').textContent = `WhatsApp: ${formattedNumber}`;
+      document.getElementById('whatsappLink').href = `https://wa.me/${waNumber}`;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.background_color || defaultConfig.background_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.background_color = value;
+                window.elementSdk.setConfig({ background_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.surface_color || defaultConfig.surface_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.surface_color = value;
+                window.elementSdk.setConfig({ surface_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.text_color = value;
+                window.elementSdk.setConfig({ text_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.primary_action_color || defaultConfig.primary_action_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.primary_action_color = value;
+                window.elementSdk.setConfig({ primary_action_color: value });
+              }
+            }
+          },
+          {
+            get: () => config.secondary_action_color || defaultConfig.secondary_action_color,
+            set: (value) => {
+              if (window.elementSdk) {
+                window.elementSdk.config.secondary_action_color = value;
+                window.elementSdk.setConfig({ secondary_action_color: value });
+              }
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || defaultConfig.font_family,
+          set: (value) => {
+            if (window.elementSdk) {
+              window.elementSdk.config.font_family = value;
+              window.elementSdk.setConfig({ font_family: value });
+            }
+          }
+        },
+        fontSizeable: {
+          get: () => config.font_size || defaultConfig.font_size,
+          set: (value) => {
+            if (window.elementSdk) {
+              window.elementSdk.config.font_size = value;
+              window.elementSdk.setConfig({ font_size: value });
+            }
+          }
+        }
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ['restaurant_name', config.restaurant_name || defaultConfig.restaurant_name],
+        ['tagline', config.tagline || defaultConfig.tagline],
+        ['whatsapp_number', config.whatsapp_number || defaultConfig.whatsapp_number],
+        ['address', config.address || defaultConfig.address],
+        ['opening_hours', config.opening_hours || defaultConfig.opening_hours]
+      ]);
+    }
+
+    function renderMenu() {
+      const menuGrid = document.getElementById('menuGrid');
+      menuGrid.innerHTML = '';
+
+      const filteredMenu = currentFilter === 'all' 
+        ? menuData 
+        : menuData.filter(item => item.category === currentFilter);
+
+      filteredMenu.forEach(item => {
+        const isLowStock = item.stock < 10;
+        const card = document.createElement('div');
+        card.className = 'menu-item-card rounded-xl shadow-md p-6 relative';
+        card.style.backgroundColor = defaultConfig.surface_color;
+        card.style.color = defaultConfig.text_color;
+        
+        card.innerHTML = `
+          ${isLowStock ? `<div class="stock-badge absolute top-4 right-4 bg-red-500 text-white text-xs px-3 py-1 rounded-full font-semibold">Stok Tinggal ${item.stock}</div>` : ''}
+          <div class="w-full h-48 rounded-lg border-2 mb-4 overflow-hidden" style="border-color: ${defaultConfig.primary_action_color}">
+            <img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" onerror="this.style.display='none'; this.parentElement.classList.add('flex', 'items-center', 'justify-center'); this.parentElement.innerHTML='<p class=\\'text-sm font-semibold opacity-60\\'>Foto ${item.name}</p>';">
+          </div>
+          <h4 class="font-bold text-lg mb-2">${item.name}</h4>
+          <p class="text-sm mb-3 opacity-80">${item.description}</p>
+          <div class="flex items-center gap-2 mb-3">
+            <span class="font-bold text-xl">Rp ${item.price.toLocaleString('id-ID')}</span>
+            ${item.spicy ? '<span class="text-xs px-2 py-1 bg-red-100 text-red-600 rounded-full">🌶️ Pedas</span>' : ''}
+          </div>
+          <button class="add-to-cart-btn w-full py-3 rounded-full font-semibold transition-colors" data-id="${item.id}">
+            Tambah ke Keranjang
+          </button>
+        `;
+        
+        menuGrid.appendChild(card);
+      });
+
+      // Reapply colors to new elements
+      if (window.elementSdk && window.elementSdk.config) {
+        const config = window.elementSdk.config;
+        document.querySelectorAll('.menu-item-card').forEach(card => {
+          card.style.backgroundColor = config.surface_color || defaultConfig.surface_color;
+          card.style.color = config.text_color || defaultConfig.text_color;
+        });
+        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+          btn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+          btn.style.color = config.surface_color || defaultConfig.surface_color;
+        });
+      }
+
+      // Add event listeners
+      document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const itemId = e.target.dataset.id;
+          const menuItem = menuData.find(m => m.id === itemId);
+          
+          if (menuItem && (menuItem.hasVariants || menuItem.hasTemperature)) {
+            openVariantModal(menuItem);
+          } else {
+            await addToCart(itemId);
+          }
+        });
+      });
+    }
+
+    function openVariantModal(item) {
+      selectedVariantItem = item;
+      selectedTemperature = item.temperatures ? item.temperatures[0] : null;
+      
+      const modal = document.getElementById('variantModal');
+      const variantSelect = document.getElementById('variantSelect');
+      const temperatureOptions = document.getElementById('temperatureOptions');
+      const modalTitle = document.getElementById('variantModalTitle');
+      const variantSelectContainer = variantSelect.parentElement;
+      
+      // Update modal title
+      modalTitle.textContent = item.hasVariants ? 'Pilih Kopi' : `Pilih ${item.name}`;
+      
+      // Show/hide variant selector based on item type
+      if (item.hasVariants) {
+        variantSelectContainer.style.display = 'block';
+        selectedVariant = item.variants[0].id;
+        
+        // Populate variant options
+        variantSelect.innerHTML = '';
+        item.variants.forEach(variant => {
+          const option = document.createElement('option');
+          option.value = variant.id;
+          option.textContent = variant.name;
+          variantSelect.appendChild(option);
+        });
+        
+        variantSelect.addEventListener('change', (e) => {
+          selectedVariant = e.target.value;
+        });
+      } else {
+        variantSelectContainer.style.display = 'none';
+        selectedVariant = null;
+      }
+      
+      // Populate temperature options
+      temperatureOptions.innerHTML = '';
+      if (item.temperatures) {
+        item.temperatures.forEach(temp => {
+          const btn = document.createElement('button');
+          btn.className = 'temp-btn py-3 rounded-lg font-semibold transition-colors';
+          btn.textContent = temp;
+          btn.dataset.temp = temp;
+          
+          if (temp === selectedTemperature) {
+            btn.style.backgroundColor = defaultConfig.primary_action_color;
+            btn.style.color = defaultConfig.surface_color;
+          } else {
+            btn.style.backgroundColor = defaultConfig.surface_color;
+            btn.style.color = defaultConfig.text_color;
+            btn.style.border = `2px solid ${defaultConfig.primary_action_color}`;
+          }
+          
+          btn.addEventListener('click', () => {
+            selectedTemperature = temp;
+            document.querySelectorAll('.temp-btn').forEach(b => {
+              b.style.backgroundColor = defaultConfig.surface_color;
+              b.style.color = defaultConfig.text_color;
+              b.style.border = `2px solid ${defaultConfig.primary_action_color}`;
+            });
+            btn.style.backgroundColor = defaultConfig.primary_action_color;
+            btn.style.color = defaultConfig.surface_color;
+            btn.style.border = 'none';
+          });
+          
+          temperatureOptions.appendChild(btn);
+        });
+      }
+      
+      modal.classList.remove('hidden');
+    }
+
+    async function addToCart(itemId, variant = null, temperature = null) {
+      const menuItem = menuData.find(m => m.id === itemId);
+      if (!menuItem) return;
+
+      // Check if item already exists in cart
+      const existingItemIndex = cartData.findIndex(item => 
+        item.item_id === itemId && 
+        item.variant === variant && 
+        item.temperature === temperature
+      );
+
+      if (existingItemIndex !== -1) {
+        // Item exists, increase quantity
+        cartData[existingItemIndex].quantity += 1;
+      } else {
+        // Add new item
+        const newItem = {
+          id: Date.now().toString(),
+          item_id: itemId,
+          quantity: 1,
+          variant: variant,
+          temperature: temperature,
+          timestamp: new Date().toISOString()
+        };
+        cartData.push(newItem);
+      }
+
+      saveCartToStorage();
+      showToast('Item ditambahkan ke keranjang!');
+    }
+
+    function updateCartUI() {
+      const badge = document.getElementById('cartBadge');
+      const totalItems = cartData.reduce((sum, item) => sum + item.quantity, 0);
+      
+      if (totalItems > 0) {
+        badge.textContent = totalItems;
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+
+      renderCartItems();
+    }
+
+    function renderCartItems() {
+      const cartItems = document.getElementById('cartItems');
+      const totalPrice = document.getElementById('totalPrice');
+      
+      if (cartData.length === 0) {
+        cartItems.innerHTML = '<p class="text-center py-8 opacity-60">Keranjang masih kosong</p>';
+        totalPrice.textContent = 'Rp 0';
+        return;
+      }
+
+      let total = 0;
+      cartItems.innerHTML = '';
+
+      cartData.forEach(cartItem => {
+        const menuItem = menuData.find(m => m.id === cartItem.item_id);
+        if (!menuItem) return;
+
+        const itemTotal = menuItem.price * cartItem.quantity;
+        total += itemTotal;
+
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'flex items-center gap-4 p-4 rounded-lg';
+        itemDiv.style.backgroundColor = defaultConfig.background_color;
+        
+        let variantText = '';
+        if (cartItem.variant && menuItem.hasVariants) {
+          const variant = menuItem.variants.find(v => v.id === cartItem.variant);
+          if (variant) {
+            variantText = `<p class="text-xs opacity-70">${variant.name}`;
+            if (cartItem.temperature) {
+              variantText += ` - ${cartItem.temperature}`;
+            }
+            variantText += `</p>`;
+          }
+        } else if (cartItem.temperature && menuItem.hasTemperature) {
+          variantText = `<p class="text-xs opacity-70">${cartItem.temperature}</p>`;
+        }
+        
+        itemDiv.innerHTML = `
+          <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+            <img src="${menuItem.image}" alt="${menuItem.name}" class="w-full h-full object-cover" onerror="this.parentElement.innerHTML='<div class=\\'w-full h-full flex items-center justify-center text-2xl\\'>${menuItem.image}</div>';">
+          </div>
+          <div class="flex-1">
+            <h5 class="font-semibold">${menuItem.name}</h5>
+            ${variantText}
+            <p class="text-sm opacity-80">Rp ${menuItem.price.toLocaleString('id-ID')}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button class="quantity-btn w-8 h-8 rounded-full font-bold transition-colors" data-action="decrease" data-id="${cartItem.id}">-</button>
+            <span class="w-8 text-center font-semibold">${cartItem.quantity}</span>
+            <button class="quantity-btn w-8 h-8 rounded-full font-bold transition-colors" data-action="increase" data-id="${cartItem.id}">+</button>
+          </div>
+          <button class="delete-btn p-2 rounded-full transition-colors" data-id="${cartItem.id}">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </button>
+        `;
+        
+        cartItems.appendChild(itemDiv);
+      });
+
+      if (window.elementSdk && window.elementSdk.config) {
+        const config = window.elementSdk.config;
+        document.querySelectorAll('.quantity-btn').forEach(btn => {
+          btn.style.backgroundColor = config.secondary_action_color || defaultConfig.secondary_action_color;
+          btn.style.color = config.surface_color || defaultConfig.surface_color;
+        });
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+          btn.style.color = config.text_color || defaultConfig.text_color;
+        });
+      }
+
+      totalPrice.textContent = `Rp ${total.toLocaleString('id-ID')}`;
+
+      // Add event listeners
+      document.querySelectorAll('.quantity-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const action = e.currentTarget.dataset.action;
+          const id = e.currentTarget.dataset.id;
+          updateQuantity(id, action);
+        });
+      });
+
+      document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.dataset.id;
+          deleteCartItem(id);
+        });
+      });
+    }
+
+    function updateQuantity(itemId, action) {
+      const item = cartData.find(i => i.id === itemId);
+      if (!item) return;
+
+      if (action === 'increase') {
+        item.quantity += 1;
+      } else if (action === 'decrease') {
+        item.quantity -= 1;
+        if (item.quantity <= 0) {
+          deleteCartItem(itemId);
+          return;
+        }
+      }
+
+      saveCartToStorage();
+    }
+
+    function deleteCartItem(itemId) {
+      cartData = cartData.filter(item => item.id !== itemId);
+      saveCartToStorage();
+    }
+
+    function updatePaymentMethodButtons() {
+      const config = window.elementSdk ? window.elementSdk.config : defaultConfig;
+      const whatsappBtn = document.getElementById('paymentWhatsApp');
+      const qrisBtn = document.getElementById('paymentQRIS');
+      
+      if (!whatsappBtn || !qrisBtn) return;
+      
+      if (selectedPaymentMethod === 'whatsapp') {
+        whatsappBtn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+        whatsappBtn.style.color = config.surface_color || defaultConfig.surface_color;
+        whatsappBtn.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+        
+        qrisBtn.style.backgroundColor = 'transparent';
+        qrisBtn.style.color = config.text_color || defaultConfig.text_color;
+        qrisBtn.style.borderColor = config.text_color || defaultConfig.text_color;
+      } else {
+        qrisBtn.style.backgroundColor = config.primary_action_color || defaultConfig.primary_action_color;
+        qrisBtn.style.color = config.surface_color || defaultConfig.surface_color;
+        qrisBtn.style.borderColor = config.primary_action_color || defaultConfig.primary_action_color;
+        
+        whatsappBtn.style.backgroundColor = 'transparent';
+        whatsappBtn.style.color = config.text_color || defaultConfig.text_color;
+        whatsappBtn.style.borderColor = config.text_color || defaultConfig.text_color;
+      }
+    }
+
+    function calculateTotal() {
+      return cartData.reduce((sum, cartItem) => {
+        const menuItem = menuData.find(m => m.id === cartItem.item_id);
+        return sum + (menuItem ? menuItem.price * cartItem.quantity : 0);
+      }, 0);
+    }
+
+    function setupEventListeners() {
+      // Filter buttons
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          currentFilter = e.target.dataset.filter;
+          
+          document.querySelectorAll('.filter-btn').forEach(b => {
+            b.style.backgroundColor = defaultConfig.surface_color;
+            b.style.color = defaultConfig.text_color;
+          });
+          
+          e.target.style.backgroundColor = defaultConfig.primary_action_color;
+          e.target.style.color = defaultConfig.surface_color;
+          
+          renderMenu();
+        });
+      });
+
+      // Variant modal
+      document.getElementById('closeVariantBtn').addEventListener('click', () => {
+        document.getElementById('variantModal').classList.add('hidden');
+      });
+
+      document.getElementById('variantOverlay').addEventListener('click', () => {
+        document.getElementById('variantModal').classList.add('hidden');
+      });
+
+      document.getElementById('confirmVariantBtn').addEventListener('click', async () => {
+        if (selectedVariantItem && selectedTemperature) {
+          document.getElementById('variantModal').classList.add('hidden');
+          if (selectedVariantItem.hasVariants) {
+            await addToCart(selectedVariantItem.id, selectedVariant, selectedTemperature);
+          } else {
+            await addToCart(selectedVariantItem.id, null, selectedTemperature);
+          }
+        }
+      });
+
+      // Cart modal
+      document.getElementById('cartButton').addEventListener('click', () => {
+        document.getElementById('cartModal').classList.remove('hidden');
+      });
+
+      document.getElementById('closeCartBtn').addEventListener('click', () => {
+        document.getElementById('cartModal').classList.add('hidden');
+      });
+
+      document.getElementById('cartOverlay').addEventListener('click', () => {
+        document.getElementById('cartModal').classList.add('hidden');
+      });
+
+      // Order now button
+      document.getElementById('orderNowBtn').addEventListener('click', () => {
+        window.scrollTo({ top: document.getElementById('menuGrid').offsetTop - 100, behavior: 'smooth' });
+      });
+
+      // Payment method selection
+      document.getElementById('paymentWhatsApp').addEventListener('click', () => {
+        selectedPaymentMethod = 'whatsapp';
+        updatePaymentMethodButtons();
+      });
+
+      document.getElementById('paymentQRIS').addEventListener('click', () => {
+        selectedPaymentMethod = 'qris';
+        updatePaymentMethodButtons();
+      });
+
+      // QRIS Modal
+      document.getElementById('closeQRISBtn').addEventListener('click', () => {
+        document.getElementById('qrisModal').classList.add('hidden');
+        document.getElementById('cartModal').classList.remove('hidden');
+      });
+
+      document.getElementById('qrisOverlay').addEventListener('click', () => {
+        document.getElementById('qrisModal').classList.add('hidden');
+        document.getElementById('cartModal').classList.remove('hidden');
+      });
+
+      document.getElementById('backToCartBtn').addEventListener('click', () => {
+        document.getElementById('qrisModal').classList.add('hidden');
+        document.getElementById('cartModal').classList.remove('hidden');
+      });
+
+      document.getElementById('confirmPaymentBtn').addEventListener('click', () => {
+        document.getElementById('qrisModal').classList.add('hidden');
+        cartData = [];
+        saveCartToStorage();
+        showToast('Terima kasih! Pesanan Anda sedang diproses.');
+      });
+
+      // Checkout
+      document.getElementById('checkoutBtn').addEventListener('click', () => {
+        if (cartData.length === 0) {
+          showToast('Keranjang masih kosong!', 'error');
+          return;
+        }
+
+        if (selectedPaymentMethod === 'qris') {
+          // Show QRIS modal
+          const total = calculateTotal();
+          document.getElementById('qrisTotal').textContent = `Rp ${total.toLocaleString('id-ID')}`;
+          document.getElementById('cartModal').classList.add('hidden');
+          document.getElementById('qrisModal').classList.remove('hidden');
+        } else {
+          // WhatsApp checkout
+          let message = '*Pesanan ANGKRINGAN BOSSKU*%0A%0A';
+          let total = 0;
+
+          cartData.forEach(cartItem => {
+            const menuItem = menuData.find(m => m.id === cartItem.item_id);
+            if (menuItem) {
+              const itemTotal = menuItem.price * cartItem.quantity;
+              total += itemTotal;
+              
+              let itemName = menuItem.name;
+              if (cartItem.variant && menuItem.hasVariants) {
+                const variant = menuItem.variants.find(v => v.id === cartItem.variant);
+                if (variant) {
+                  itemName = `${menuItem.name} (${variant.name}`;
+                  if (cartItem.temperature) {
+                    itemName += ` - ${cartItem.temperature}`;
+                  }
+                  itemName += ')';
+                }
+              } else if (cartItem.temperature && menuItem.hasTemperature) {
+                itemName = `${menuItem.name.replace(' (Es/Hangat)', '')} (${cartItem.temperature})`;
+              }
+              
+              message += `${cartItem.quantity}x ${itemName} - Rp ${itemTotal.toLocaleString('id-ID')}%0A`;
+            }
+          });
+
+          message += `%0A*Total: Rp ${total.toLocaleString('id-ID')}*`;
+          
+          const waNumber = window.elementSdk ? 
+            (window.elementSdk.config.whatsapp_number || defaultConfig.whatsapp_number) : 
+            defaultConfig.whatsapp_number;
+          
+          window.open(`https://wa.me/${waNumber}?text=${message}`, '_blank', 'noopener,noreferrer');
+        }
+      });
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.style.backgroundColor = type === 'error' ? '#ef4444' : '#10b981';
+      toast.textContent = message;
+      
+      document.getElementById('toastContainer').appendChild(toast);
+      
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+
+    // Initialize app
+    initApp();
+  </script>
+  </div>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9a614a48439f58c3',t:'MTc2NDQxMDc2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
